@@ -1,65 +1,92 @@
-# SecureClientVPN
-
-
-
-
-=====For reference=====
-# 🔔 AWS Cost Tracker: Real-Time Budget Alerts  
-*Automated cost monitoring with AWS Budgets, Lambda, SNS, and CloudWatch*  
+# 🔒 Secure Client VPN to EC2: AWS Private Access Lab  
+*Configure a secure, certificate-based VPN tunnel to private EC2 instances using AWS Client VPN*  
 
 [![AWS](https://img.shields.io/badge/AWS-FF9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com) 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python)](https://python.org)
+[![Terraform](https://img.shields.io/badge/Infrastructure-As__Code-7B42BC?logo=terraform)](https://terraform.io)  
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-## 📌 Objectives
-✅ Cost Visibility: Monitor AWS spend in real-time
+---
 
-✅ Automated Alerts: Trigger notifications at 80%/100% thresholds
+## 📌 Lab Objectives  
+✅ **Secure Access**: Certificate-based VPN authentication  
+✅ **Private Networking**: Isolate EC2 instances in private subnets  
+✅ **High Availability**: Multi-AZ VPN endpoint deployment  
+✅ **Cost Control**: Automated cleanup scripts  
 
-✅ Cross-Service Integration: Connect Budgets → Lambda → SNS
+---
 
-## 🛠️ Technologies Used
-- **AWS Services**: AWS Budgets, Lambda, SNS, CloudWatch
+## 🛠️ Technologies Used  
+- **AWS Services**: Client VPN, VPC, EC2, ACM, IAM  
+- **Security**: TLS certificates, Security Groups, Least-Privilege Access  
+- **Automation**: AWS CLI, CloudFormation (optional)  
 
-## 🏗️ Architecture
-- AWS Budgets → Lambda → SNS → Email
-- ![Architecture](diagram/CostTracker_Diagram.png)
+---
 
-## 📋 Steps
-1. Create SNS Topic and confirm subscription
-2. Deploy Lambda function with publish permissions
-3. Set AWS Budget with threshold and SNS action
-4. Validate alert triggers and log output
+## 🏗️ Architecture  
+![AWS Client VPN Architecture](diagrams/vpn-architecture.png)  
+*Data Flow*:  
+`Client Device → VPN Endpoint (192.168.0.0/22) → Private EC2 (10.0.3.0/24)`  
 
-## 📸 Visuals
-| Results | Image |
-|-------------|-------|
-| SNS Topic | ![Alert](images/Topic.png) |
-| SNS Email | ![Alert](images/AWSBudgetSNS.png) |
-| Lambda Test | ![Alert](images/LambdaEmail.png) |
-| Lambda Email | ![Alert](images/AWSBudgetLambda.png) |
-| Output Logs | ![Alert](images/CloudwatchLog_Lambda.png) |
+---
 
-### **4. Code Snippets**
-#### **Lambda Pythong Code** (`scripts/LambdaPythonAlert.py`):
+### **2. Deploy Infrastructure**  
 ```bash
-import json
-import boto3
+# Create VPC and subnets (public/private)
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+aws ec2 create-subnet --vpc-id vpc-123 --cidr-block 10.0.1.0/24 --availability-zone us-east-1a
 
-def lambda_handler(event, context):
-    sns = boto3.client('sns')
-    alert = f"""
-    🚨 AWS BUDGET ALERT 🚨
-    {json.dumps(event, indent=2)}
-    """
-    sns.publish(
-        TopicArn='arn:aws:sns:us-east-1:726648044823:budget-alert-topic',
-        Message=alert,
-        Subject='AWS Budget Alert!'
-    )
-    return {'statusCode': 200}
+# Request ACM certificate (replace domain)
+aws acm request-certificate --domain-name vpn.yourdomain.com --validation-method DNS
 ```
 
-## 🚀 How to Deploy
+### **3. Configure VPN**  
 ```bash
-# Clone repo
-git clone https://github.com/nickjduran15/AWS-Cost-Tracker.git
+# Create VPN endpoint (adjust ARN)
+aws ec2 create-client-vpn-endpoint \
+  --client-cidr-block 192.168.0.0/22 \
+  --server-certificate-arn arn:aws:acm:us-east-1:123456789012:certificate/abc123
+```
+
+---
+
+## 📋 Step-by-Step Guide  
+### **1. VPC Setup**  
+- **Public Subnets**: `10.0.1.0/24`, `10.0.2.0/24` (multi-AZ)  
+- **Private Subnet**: `10.0.3.0/24`  
+- **Route Tables**: [See configuration](docs/route-tables.md)  
+
+### **2. Certificate Setup**  
+- ACM public certificate for `vpn.yourdomain.com` (DNS validation)  
+
+### **3. VPN Endpoint**  
+- **Client CIDR**: `192.168.0.0/22`  
+- **Authentication**: Certificate-based (ACM)  
+
+### **4. Testing**  
+```bash
+# Connect via VPN (OpenVPN config)
+sudo openvpn --config client-config.ovpn
+
+# SSH to private EC2
+ssh -i key.pem ec2-user@10.0.3.10
+```
+
+---
+
+## 📸 Screenshots  
+| Component | Visual |  
+|-----------|--------|  
+| **VPN Endpoint** | ![Endpoint](screenshots/vpn-endpoint.png) |  
+| **Connected Client** | ![VPN Connected](screenshots/vpn-connected.png) |  
+| **Security Group** | ![Security Group](screenshots/sg-rules.png) |  
+
+---
+
+## 🚀 Quick Deployment  
+### **1. Clone the Repository**  
+```bash
+git clone https://github.com/your-repo/aws-client-vpn-lab.git
+cd aws-client-vpn-lab
+```
+
+Let me know if you'd like to emphasize any other aspects!
