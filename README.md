@@ -88,5 +88,3 @@ ssh -i key.pem ec2-user@10.0.3.10
 git clone https://github.com/your-repo/aws-client-vpn-lab.git
 cd aws-client-vpn-lab
 ```
-
-Let me know if you'd like to emphasize any other aspects!
