@@ -29,26 +29,6 @@
 
 ---
 
-### **2. Deploy Infrastructure**  
-```bash
-# Create VPC and subnets (public/private)
-aws ec2 create-vpc --cidr-block 10.0.0.0/16
-aws ec2 create-subnet --vpc-id vpc-123 --cidr-block 10.0.1.0/24 --availability-zone us-east-1a
-
-# Request ACM certificate (replace domain)
-aws acm request-certificate --domain-name vpn.yourdomain.com --validation-method DNS
-```
-
-### **3. Configure VPN**  
-```bash
-# Create VPN endpoint (adjust ARN)
-aws ec2 create-client-vpn-endpoint \
-  --client-cidr-block 192.168.0.0/22 \
-  --server-certificate-arn arn:aws:acm:us-east-1:123456789012:certificate/abc123
-```
-
----
-
 ## 📋 Step-by-Step Guide  
 ### **1. VPC Setup**  
 - **Public Subnets**: `10.0.1.0/24`, `10.0.2.0/24` (multi-AZ)  
