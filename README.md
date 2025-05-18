@@ -23,7 +23,7 @@
 ---
 
 ## 🏗️ Architecture  
-![AWS Client VPN Architecture](diagrams/vpn-architecture.png)  
+![AWS Client VPN Architecture](diagram/SimpleClientDiagram.drawio.png)  
 *Data Flow*:  
 `Client Device → VPN Endpoint (192.168.0.0/22) → Private EC2 (10.0.3.0/24)`  
 
