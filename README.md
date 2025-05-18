@@ -33,7 +33,6 @@
 ### **1. VPC Setup**  
 - **Public Subnets**: `10.0.1.0/24`, `10.0.2.0/24` (multi-AZ)  
 - **Private Subnet**: `10.0.3.0/24`  
-- **Route Tables**: [See configuration](docs/route-tables.md)  
 
 ### **2. Certificate Setup**  
 - ACM public certificate for `vpn.yourdomain.com` (DNS validation)  
